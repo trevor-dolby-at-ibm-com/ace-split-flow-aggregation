@@ -1,0 +1,20 @@
+
+
+CREATE COMPUTE MODULE Outbound_Compute2
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		DECLARE serverName CHARACTER ExecutionGroupLabel;
+		DECLARE hostName CHARACTER;
+		SET hostName = javaLangSystemGetenv('HOSTNAME');
+		IF hostName IS NOT NULL THEN
+			SET serverName = ExecutionGroupLabel || '-' || javaLangSystemGetenv('HOSTNAME'); -- javaLangSystemGetenv declared in another file
+		END IF;
+		
+        SET OutputRoot.Properties = InputRoot.Properties;
+        SET OutputRoot.MQMD.ReplyToQ = 'BACKEND.REPLY';
+        SET OutputRoot.JSON.Data.test = InputRoot.JSON.Data.test;
+        SET OutputRoot.JSON.Data.log.path = InputRoot.JSON.Data.log.path;
+        SET OutputRoot.JSON.Data.log.path.fanout.two = serverName; 
+		RETURN TRUE;
+	END;
+END MODULE;

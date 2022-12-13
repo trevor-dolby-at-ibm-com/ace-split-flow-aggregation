@@ -1,0 +1,10 @@
+
+
+CREATE COMPUTE MODULE TimerFlow_SetNoMessageFlag
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET Environment.NoMessage = true;
+		RETURN TRUE;
+	END;
+
+END MODULE;

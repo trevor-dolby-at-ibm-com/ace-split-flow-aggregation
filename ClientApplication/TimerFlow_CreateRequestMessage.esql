@@ -1,0 +1,21 @@
+
+
+CREATE COMPUTE MODULE TimerFlow_CreateRequestMessage
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+        SET OutputRoot.Properties = InputRoot.Properties;
+        SET OutputRoot.JSON.Data.test.message = 'test';
+        
+        DECLARE timeout INTEGER;
+        SET timeout = MOD(InputLocalEnvironment.TimeoutRequest.Count, 4);
+        IF timeout = 0 THEN
+	        SET OutputRoot.JSON.Data.test.variant = 'timeout';
+        ELSE	
+        	SET OutputRoot.JSON.Data.test.variant = 'reply';
+        END IF;
+        SET OutputRoot.JSON.Data.test.count = InputLocalEnvironment.TimeoutRequest.Count;
+      	LOG EVENT SEVERITY 3 CATALOG 'BIPmsgs' MESSAGE 8099 VALUES('Sending type', OutputRoot.JSON.Data.test.variant, InputLocalEnvironment.TimeoutRequest.Count);
+        
+		RETURN TRUE;
+	END;
+END MODULE;

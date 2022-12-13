@@ -1,0 +1,21 @@
+-- Copyright (c) 2022 Open Technologies for Integration
+-- Licensed under the MIT license (see LICENSE for details)
+
+CREATE COMPUTE MODULE Reply_Complete
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		DECLARE serverName CHARACTER ExecutionGroupLabel;
+		DECLARE hostName CHARACTER;
+		SET hostName = javaLangSystemGetenv('HOSTNAME');
+		IF hostName IS NOT NULL THEN
+			SET serverName = ExecutionGroupLabel || '-' || javaLangSystemGetenv('HOSTNAME'); -- javaLangSystemGetenv declared in another file
+		END IF;
+		
+        SET OutputRoot.Properties = InputRoot.Properties;
+        SET OutputRoot.JSON.Data.reply = 'success';
+        SET OutputRoot.JSON.Data.log.path.one = InputRoot.ComIbmAggregateReplyBody.one.JSON.Data.log.path;
+        SET OutputRoot.JSON.Data.log.path.two = InputRoot.ComIbmAggregateReplyBody.two.JSON.Data.log.path;
+        SET OutputRoot.JSON.Data.log.path.faninreply = serverName; 
+		RETURN TRUE;
+	END;
+END MODULE;

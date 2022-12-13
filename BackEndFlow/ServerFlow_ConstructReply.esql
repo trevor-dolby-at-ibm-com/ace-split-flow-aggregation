@@ -1,0 +1,34 @@
+-- Copyright (c) 2022 Open Technologies for Integration
+-- Licensed under the MIT license (see LICENSE for details)
+
+CREATE FUNCTION javaLangSystemGetenv( IN name CHARACTER )
+	RETURNS CHARACTER
+	LANGUAGE JAVA
+	EXTERNAL NAME "java.lang.System.getenv";
+
+CREATE COMPUTE MODULE ServerFlow_ConstructReply
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		DECLARE serverName CHARACTER ExecutionGroupLabel;
+		DECLARE hostName CHARACTER;
+		SET hostName = javaLangSystemGetenv('HOSTNAME');
+		IF hostName IS NOT NULL THEN
+			SET serverName = ExecutionGroupLabel || '-' || javaLangSystemGetenv('HOSTNAME');
+		END IF;
+		
+		-- No sleep here - the fan-in flow will sleep to try and spread the messages around
+		-- SET Environment.something = SLEEP(10);
+		
+        SET OutputRoot.Properties = InputRoot.Properties;
+        SET OutputRoot.MQMD = InputRoot.MQMD;
+        SET OutputRoot.JSON.Data.reply.message = 'success';
+        SET OutputRoot.JSON.Data.log.path = InputRoot.JSON.Data.log.path;
+        SET OutputRoot.JSON.Data.log.path.backend = serverName; 
+        
+        IF InputRoot.JSON.Data.timeout = 'true' THEN
+        	RETURN FALSE;
+        ELSE	
+			RETURN TRUE;
+        END IF;
+	END;
+END MODULE;

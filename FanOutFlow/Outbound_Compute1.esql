@@ -1,0 +1,33 @@
+-- Copyright (c) 2022 Open Technologies for Integration
+-- Licensed under the MIT license (see LICENSE for details)
+
+CREATE FUNCTION javaLangSystemGetenv( IN name CHARACTER )
+	RETURNS CHARACTER
+	LANGUAGE JAVA
+	EXTERNAL NAME "java.lang.System.getenv";
+
+
+CREATE COMPUTE MODULE Outbound_Compute1
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		DECLARE serverName CHARACTER ExecutionGroupLabel;
+		DECLARE hostName CHARACTER;
+		SET hostName = javaLangSystemGetenv('HOSTNAME');
+		IF hostName IS NOT NULL THEN
+			SET serverName = ExecutionGroupLabel || '-' || javaLangSystemGetenv('HOSTNAME');
+		END IF;
+		
+        SET OutputRoot.Properties = InputRoot.Properties;
+        SET OutputRoot.MQMD.ReplyToQ = 'BACKEND.REPLY';
+        SET OutputRoot.JSON.Data.test = InputRoot.JSON.Data.test;
+        SET OutputRoot.JSON.Data.log.path = InputRoot.JSON.Data.log.path;
+        SET OutputRoot.JSON.Data.log.path.fanout.one = serverName; 
+        
+        -- If we've been asked to time out, then send a signal to the backend flow
+        IF InputRoot.JSON.Data.test.variant = 'timeout' THEN
+        	SET OutputRoot.JSON.Data.timeout = 'true';
+        END IF;
+        
+		RETURN TRUE;
+	END;
+END MODULE;

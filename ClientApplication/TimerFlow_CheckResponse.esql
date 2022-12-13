@@ -1,0 +1,9 @@
+
+
+CREATE COMPUTE MODULE TimerFlow_CheckResponse
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+        LOG EVENT SEVERITY 3 VALUES(InputRoot.JSON.Data.reply, InputRoot.JSON.Data.log.path);
+		RETURN TRUE;
+	END;
+END MODULE;

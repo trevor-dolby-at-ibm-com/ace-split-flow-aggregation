@@ -1,0 +1,19 @@
+
+
+CREATE COMPUTE MODULE TimerFlow_Clear_Queue
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER 20;
+
+		WHILE I < J DO
+			PROPAGATE;
+			IF Environment.NoMessage = true THEN
+				SET I = J;
+			END IF;
+			SET I = I + 1; 
+		END WHILE;
+ 	
+		RETURN FALSE;
+	END;
+END MODULE;

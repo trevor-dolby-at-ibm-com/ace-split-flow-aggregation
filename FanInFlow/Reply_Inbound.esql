@@ -1,0 +1,29 @@
+-- Copyright (c) 2022 Open Technologies for Integration
+-- Licensed under the MIT license (see LICENSE for details)
+
+CREATE FUNCTION javaLangSystemGetenv( IN name CHARACTER )
+	RETURNS CHARACTER
+	LANGUAGE JAVA
+	EXTERNAL NAME "java.lang.System.getenv";
+
+CREATE COMPUTE MODULE Reply_Inbound
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		DECLARE serverName CHARACTER ExecutionGroupLabel;
+		DECLARE hostName CHARACTER;
+		SET hostName = javaLangSystemGetenv('HOSTNAME');
+		IF hostName IS NOT NULL THEN
+			SET serverName = ExecutionGroupLabel || '-' || javaLangSystemGetenv('HOSTNAME'); -- javaLangSystemGetenv declared in another file
+		END IF;
+
+		-- Force a sleep to allow other servers to pick up subsequent messages 
+		SET Environment.something = SLEEP(10);
+
+        SET OutputRoot.Properties = InputRoot.Properties;
+        SET OutputRoot.MQMD = InputRoot.MQMD;
+        SET OutputRoot.JSON.Data.reply = InputRoot.JSON.Data.reply;
+        SET OutputRoot.JSON.Data.log.path = InputRoot.JSON.Data.log.path;
+        SET OutputRoot.JSON.Data.log.path.fanin = serverName; 
+		RETURN TRUE;
+	END;
+END MODULE;
