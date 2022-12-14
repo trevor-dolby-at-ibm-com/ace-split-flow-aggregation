@@ -1,0 +1,44 @@
+-- Copyright (c) 2022 Open Technologies for Integration
+-- Licensed under the MIT license (see LICENSE for details)
+
+
+CREATE COMPUTE MODULE TimerFlow_RepeatRequest
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+        DECLARE repeatCount INTEGER 0;
+		DECLARE variant CHARACTER 'reply'; -- Can also be set to timeout
+		
+        IF InputLocalEnvironment.HTTP.Input.QueryString.variant IS NOT NULL THEN
+        	SET variant = InputLocalEnvironment.HTTP.Input.QueryString.variant;
+        END IF;
+        IF InputLocalEnvironment.HTTP.Input.QueryString.repeatCount IS NOT NULL THEN
+            SET repeatCount = CAST(InputLocalEnvironment.HTTP.Input.QueryString.repeatCount AS INTEGER);
+
+			DECLARE I INTEGER 1;
+
+			WHILE I < repeatCount DO
+				CALL SendOneMessage(I, variant);
+				SET I = I + 1; 
+			END WHILE;
+        END IF;
+		SET Environment.sendReply = true;
+		CALL SendOneMessage(repeatCount, variant);
+		
+		RETURN FALSE;
+	END;
+	
+	
+	CREATE FUNCTION SendOneMessage(IN count INTEGER, IN variant CHARACTER) 
+	BEGIN
+        SET OutputRoot.Properties = InputRoot.Properties;
+        
+		-- Tell the other flow to use the queue for our MQGet node.
+		SET OutputRoot.MQMD.ReplyToQ = 'FAN.IN.REPLY';
+	
+        SET OutputRoot.JSON.Data.test.message = 'test';
+       	SET OutputRoot.JSON.Data.test.variant = variant;
+        SET OutputRoot.JSON.Data.test.count = count;
+        
+        PROPAGATE;
+	END;
+END MODULE;

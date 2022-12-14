@@ -1,3 +1,5 @@
+-- Copyright (c) 2022 Open Technologies for Integration
+-- Licensed under the MIT license (see LICENSE for details)
 
 
 CREATE COMPUTE MODULE TimerFlow_SetCorrelId

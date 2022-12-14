@@ -1,0 +1,13 @@
+-- Copyright (c) 2022 Open Technologies for Integration
+-- Licensed under the MIT license (see LICENSE for details)
+
+
+CREATE COMPUTE MODULE HTTPFlow_CreateReply
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+        SET OutputRoot.Properties = InputRoot.Properties;
+        SET OutputRoot.Properties.ContentType = 'application/json';
+        SET OutputRoot.JSON = InputRoot.JSON;
+		RETURN TRUE;
+	END;
+END MODULE;
