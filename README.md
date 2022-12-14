@@ -7,9 +7,15 @@ within an integration node.
 
 ## Application overview
 
-The ClientApplication is timer-driven, and calls the FanOut flow:
+The ClientApplication has two flows to drive the overall scenario: an HTTP flow, and a timer-based flow.
+
+The timer-driven flow calls the FanOut flow and prints output via the trace node:
 
 ![client-application](files/client-application.png)
+
+The HTTP flow calls the FanOut flow with optional repeatCount:
+
+![client-application-http](files/client-application-http.png)
 
 The FanOut flow sends two calls to the Backend service:
 
@@ -25,8 +31,13 @@ The FanIn flow receives the responses from the Backend flow, and sends the reply
 
 ## Timeouts
 
-Every forth message from the client is set to time out, where the Backend flow will not reply to 
-the second aggregation message.
+Every forth message from the timer client is set to time out, where the Backend flow will not reply 
+to the second aggregation message. The HTTP client can accept a parameter called `variant` along with
+the optional `repeatCount`:
+```
+curl 'http://localhost:7800/httpFlow?variant=timeout&repeatCount=5'
+```
+would send five messages that will time out.
 
 ## Example results in a single server
 
