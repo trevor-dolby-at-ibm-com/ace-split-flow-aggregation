@@ -24,6 +24,8 @@ CREATE COMPUTE MODULE Reply_Inbound
         SET OutputRoot.JSON.Data.reply = InputRoot.JSON.Data.reply;
         SET OutputRoot.JSON.Data.log.path = InputRoot.JSON.Data.log.path;
         SET OutputRoot.JSON.Data.log.path.fanin = serverName; 
+        SET OutputRoot.JSON.Data.mqCorrelId = InputRoot.JSON.Data.mqCorrelId;
+        
 		RETURN TRUE;
 	END;
 END MODULE;

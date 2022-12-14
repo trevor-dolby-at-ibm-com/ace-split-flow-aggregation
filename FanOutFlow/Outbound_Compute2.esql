@@ -15,6 +15,8 @@ CREATE COMPUTE MODULE Outbound_Compute2
         SET OutputRoot.JSON.Data.test = InputRoot.JSON.Data.test;
         SET OutputRoot.JSON.Data.log.path = InputRoot.JSON.Data.log.path;
         SET OutputRoot.JSON.Data.log.path.fanout.two = serverName; 
+        SET OutputRoot.JSON.Data.mqCorrelId = BASE64ENCODE(InputRoot.MQMD.MsgId);
+        
 		RETURN TRUE;
 	END;
 END MODULE;

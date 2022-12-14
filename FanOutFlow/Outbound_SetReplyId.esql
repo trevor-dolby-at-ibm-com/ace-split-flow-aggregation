@@ -1,0 +1,11 @@
+
+
+CREATE COMPUTE MODULE Outbound_SetReplyId
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot = InputRoot;
+		SET OutputRoot.Properties.ReplyIdentifier = InputRoot.MQMD.MsgId;
+	
+		RETURN TRUE;
+	END;
+END MODULE;

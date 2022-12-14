@@ -24,7 +24,8 @@ CREATE COMPUTE MODULE ServerFlow_ConstructReply
         SET OutputRoot.JSON.Data.reply.message = 'success';
         SET OutputRoot.JSON.Data.log.path = InputRoot.JSON.Data.log.path;
         SET OutputRoot.JSON.Data.log.path.backend = serverName; 
-        
+        SET OutputRoot.JSON.Data.mqCorrelId = InputRoot.JSON.Data.mqCorrelId;
+
         IF InputRoot.JSON.Data.timeout = 'true' THEN
         	RETURN FALSE;
         ELSE	

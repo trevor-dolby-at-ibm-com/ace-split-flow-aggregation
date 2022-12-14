@@ -12,6 +12,12 @@ CREATE COMPUTE MODULE Reply_Complete
 		END IF;
 		
         SET OutputRoot.Properties = InputRoot.Properties;
+        SET OutputRoot.MQMD.Expiry = 600; -- One minute
+        SET OutputRoot.MQMD.CorrelId = InputRoot.Properties.ReplyIdentifier;
+        -- Try the body data if the Aggregate ReplyIdentifier is not set
+        IF OutputRoot.MQMD.CorrelId IS NULL THEN
+        	SET OutputRoot.MQMD.CorrelId = BASE64DECODE(InputRoot.ComIbmAggregateReplyBody.one.JSON.Data.mqCorrelId);
+        END IF;
         SET OutputRoot.JSON.Data.reply = 'success';
         SET OutputRoot.JSON.Data.log.path.one = InputRoot.ComIbmAggregateReplyBody.one.JSON.Data.log.path;
         SET OutputRoot.JSON.Data.log.path.two = InputRoot.ComIbmAggregateReplyBody.two.JSON.Data.log.path;

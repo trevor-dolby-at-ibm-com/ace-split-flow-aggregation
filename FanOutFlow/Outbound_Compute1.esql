@@ -22,6 +22,7 @@ CREATE COMPUTE MODULE Outbound_Compute1
         SET OutputRoot.JSON.Data.test = InputRoot.JSON.Data.test;
         SET OutputRoot.JSON.Data.log.path = InputRoot.JSON.Data.log.path;
         SET OutputRoot.JSON.Data.log.path.fanout.one = serverName; 
+		SET OutputRoot.JSON.Data.mqCorrelId = BASE64ENCODE(InputRoot.MQMD.MsgId);
         
         -- If we've been asked to time out, then send a signal to the backend flow
         IF InputRoot.JSON.Data.test.variant = 'timeout' THEN

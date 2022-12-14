@@ -4,6 +4,10 @@ CREATE COMPUTE MODULE TimerFlow_CreateRequestMessage
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
         SET OutputRoot.Properties = InputRoot.Properties;
+        
+		-- Tell the other flow to use the queue for our MQGet node.
+		SET OutputRoot.MQMD.ReplyToQ = 'FAN.IN.REPLY';
+		
         SET OutputRoot.JSON.Data.test.message = 'test';
         
         DECLARE timeout INTEGER;
